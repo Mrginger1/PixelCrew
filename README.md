@@ -1,126 +1,186 @@
 <p align="center">
-  <img src="docs/pixelcrew-avatar.svg" width="112" alt="PixelCrew pixel secretary avatar">
+  <img src="docs/pixelcrew-avatar.svg" width="124" alt="PixelCrew pixel secretary avatar">
 </p>
 
-<h1 align="center">PixelCrew 🏢</h1>
-<p align="center"><strong>Your agents have desks now.</strong><br>把 Codex 多任务项目变成一间会自己更新的像素办公室。</p>
+<h1 align="center">PixelCrew</h1>
+<p align="center">
+  <strong>Project operations, made visible.</strong><br>
+  A living pixel office for Codex multi-task projects.
+</p>
 
-PixelCrew 自动发现属于同一项目的 Codex 任务，把每个任务安排成一名 Crew：计划是进度条，最新进展是语言泡泡，里程碑是可逐条翻阅的木板记录，模型、视频和报告则进入成果柜。**不需要先找秘书手工搭办公室**；`init + serve` 就能完成确定性、只读同步。AI 秘书只是可选的跨任务总结增强。
+<p align="center">
+  <a href="https://github.com/Mrginger1/PixelCrew/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Mrginger1/PixelCrew/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-7c5cff.svg"></a>
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg">
+  <img alt="Runtime dependencies: zero" src="https://img.shields.io/badge/runtime_dependencies-0-1f9d72.svg">
+  <img alt="Local first" src="https://img.shields.io/badge/local--first-yes-f59e0b.svg">
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="docs/OPERATING_MODEL.md">Operating Model</a> ·
+  <a href="docs/SECRETARY.md">Secretary</a> ·
+  <a href="README.zh-CN.md">简体中文</a>
+</p>
+
+---
+
+PixelCrew turns the tasks inside a Codex project into a calm, self-updating pixel office. Each task becomes a crew member. Plans become progress boards. Live updates appear as speech bubbles. Milestones, reports, videos, and models remain traceable as evidence—not buried in chat history.
+
+**No office setup ritual. No mandatory LLM. No productivity theatre.** Run `init + serve` and PixelCrew discovers the project, builds the office, and keeps it in sync using local, read-only data.
 
 ![PixelCrew dashboard](docs/dashboard-preview.png)
 
-## 一眼能看见什么
+## The project, at a glance
 
-| 真实项目 | PixelCrew 世界 |
+| In your project | Inside PixelCrew |
 |---|---|
-| Codex 项目任务 | 一名自动入驻的 Crew |
-| 总规划任务 | 项目负责人 |
-| `update_plan` | 工位进度与阶段记录 |
-| 最新汇报 | 人物语言泡泡 |
-| 阻塞 / 等待 | 状态灯与关注队列 |
-| 每名 Crew 的历史 | 一张汇总卡 + 可点开的木板档案 |
-| 检查点 / 里程碑 | 可逐条点击的完整记录 |
-| 模型、视频、报告 | 成果柜里的交付证据 |
-| 跨任务态势 | 规则秘书或 Codex AI 秘书 |
+| Codex task | A crew member with a desk |
+| Lead planning task | Project lead |
+| `update_plan` steps | Progress board and phase history |
+| Latest task update | Live speech bubble |
+| Blocked or waiting state | Status light and attention queue |
+| Milestones and checkpoints | Browsable report cards on a wooden board |
+| Models, videos, reports, files | Evidence in the delivery cabinet |
+| Cross-task activity | Rule-based or optional AI secretary brief |
 
-PixelCrew 不把消息数量当生产力，也不会为了热闹编造进度。阶段成果来自任务真实记录；“完成”最好同时带文件或验证证据。
+PixelCrew deliberately avoids treating message volume as productivity. A milestone comes from real task history; a completion is strongest when it includes an artifact or reproducible verification.
 
-![PixelCrew report](docs/report-preview.png)
+<table>
+  <tr>
+    <td width="50%"><img src="docs/report-preview.png" alt="PixelCrew crew report"></td>
+    <td width="50%"><img src="docs/checkpoint-preview.png" alt="PixelCrew checkpoint detail"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>One clean report per crew member</strong></td>
+    <td align="center"><strong>Every checkpoint opens into full context</strong></td>
+  </tr>
+</table>
 
-点击任一检查点或里程碑，还能打开当时的完整记录，而不是只看截断摘要：
+## Why PixelCrew
 
-![PixelCrew checkpoint detail](docs/checkpoint-preview.png)
+- **Automatic discovery** — new Codex tasks join the office without editing the frontend.
+- **Evidence over vibes** — milestones link back to reports, checkpoints, files, and verification.
+- **Deterministic by default** — the built-in secretary works without a model call.
+- **AI when it adds value** — an optional Codex secretary synthesizes cross-task context.
+- **Local and read-only** — the server binds to `127.0.0.1` and never controls your tasks.
+- **Portable by design** — reuse the same office across software, research, robotics, data, or content projects.
+- **Zero runtime dependencies** — a small Python install with no third-party runtime packages.
 
-## 三分钟入驻
+## Quick Start
 
-要求 Python 3.10+，并已在本机登录 Codex。
+**Requirements:** Python 3.10+ and a local Codex installation with an existing signed-in workspace.
 
 ```bash
-git clone https://github.com/<your-account>/pixelcrew.git
-cd pixelcrew
+git clone https://github.com/Mrginger1/PixelCrew.git
+cd PixelCrew
 python3 -m pip install -e .
 
-# 1) 给任意项目生成本地配置
+# Create a local configuration for any project
 pixelcrew init /absolute/path/to/your/project --name "My Fantastic Project"
 
-# 2) 确认 Codex 数据可读取、任务能被发现
+# Verify that local Codex data and project tasks are discoverable
 pixelcrew doctor
 
-# 3) 启动只读办公室
+# Open the office
 pixelcrew serve
 ```
 
-打开 [http://127.0.0.1:8765](http://127.0.0.1:8765)。新任务、进度和成果会自动同步，无需改网页。
+Visit **[http://127.0.0.1:8765](http://127.0.0.1:8765)**. Future tasks, progress updates, and artifacts synchronize automatically—there is no dashboard JSON to maintain by hand.
 
-> 只想先体验？阅读 [`docs/QUICKSTART.md`](docs/QUICKSTART.md)。旧版 `python3 pixelcrew.py --config ... --port 8765` 仍兼容。
+> Want a guided first run? See the **[Quick Start guide](docs/QUICKSTART.md)**. The legacy `python3 pixelcrew.py --config ... --port 8765` entry point remains supported.
 
-## 秘书：默认规则，可选 AI
+## How it works
 
-办公室本身完全不需要 LLM：规则秘书会根据状态、计划和关注队列即时生成事实简报。需要更有上下文的跨员工分析时，主动运行：
+```mermaid
+flowchart LR
+    A["Local Codex state<br/>tasks · plans · updates"] -->|read-only discovery| B["PixelCrew indexer"]
+    C["Project config<br/>roles · artifact roots"] --> B
+    B --> D["Normalized project snapshot"]
+    D --> E["Pixel office<br/>crew · bubbles · boards"]
+    D --> F["Rule secretary<br/>always available"]
+    D -. "optional, redacted" .-> G["Codex AI secretary"]
+    F --> E
+    G --> E
+```
+
+PixelCrew reads local Codex state, filters tasks by workspace, and derives a normalized project snapshot. The web UI renders that snapshot; it does not start, stop, edit, or impersonate agents.
+
+## A secretary that knows its boundaries
+
+The office does **not** require an LLM. Its rule secretary produces factual briefs from status, plans, and the attention queue. When deeper synthesis is useful, opt in to the Codex AI secretary:
 
 ```bash
-# 预览将送入模型的脱敏内容，不产生模型调用
+# Inspect the redacted prompt without making a model call
 pixelcrew secretary --dry-run
 
-# 使用当前 Codex 登录生成一次 AI 简报
+# Generate one AI-assisted project brief using the current Codex login
 pixelcrew secretary
 
-# 可选：每 15 分钟值班刷新
+# Optional watch duty: refresh every 15 minutes
 pixelcrew secretary --watch --interval 900
 ```
 
-AI 秘书以临时、只读 Codex 会话运行；输入会移除任务 ID、绝对路径和常见密钥。调用失败或缓存过期时，页面仍可降级到规则秘书。**它不会默认后台调用模型，也不会替用户做决策。** 详见 [`docs/SECRETARY.md`](docs/SECRETARY.md)。
+The AI secretary runs in a temporary, read-only Codex session. Task IDs, absolute paths, UUIDs, and common secret patterns are redacted before use. If AI generation fails or its cache expires, the office falls back to the rule secretary. It never runs silently in the background and never makes decisions for the user.
 
-## 迁移到另一个项目
+Read the full boundary model in **[Secretary Design](docs/SECRETARY.md)**.
 
-无需重画办公室，只需另一份配置：
+## One office, many projects
+
+Create another config; do not rebuild the UI:
 
 ```bash
 pixelcrew init /path/to/another/project \
   --name "Another Adventure" \
   --output pixelcrew.another.json
+
 pixelcrew doctor --config pixelcrew.another.json
 pixelcrew serve --config pixelcrew.another.json --port 8766
 ```
 
-适用于软件开发、科研实验、机器人训练、内容制作、数据分析等 Codex 多任务项目。没有预设角色的新任务也会自动入驻；需要稳定昵称时再配置 `roles`。
+Tasks without predefined roles are admitted automatically. Add `roles` only when you want stable names, titles, or responsibilities.
 
-## 给 Agent 一套清晰的工作架构
+## More than a dashboard: an operating model
 
-PixelCrew 附带一套轻量协作协议：
+PixelCrew ships with a lightweight structure for running multi-task agent projects:
 
-- **项目负责人**持有目标、依赖关系和最终验收权；
-- **执行 Crew**接收边界清晰、可独立交付的工作包；
-- **验证 Crew**不重复实现，只提交可复现证据；
-- 只在里程碑、路线变化、验证结论或风险变化时写阶段报告；
-- 每名 Crew 的多条记录收拢为一张档案，首页保持简洁；
-- 等待就是等待，阻塞写清解锁条件，完成必须有证据。
+- a **project lead** owns goals, dependencies, decisions, and final acceptance;
+- **delivery crews** receive bounded work packages with explicit outputs;
+- a **verification crew** produces reproducible evidence instead of duplicating implementation;
+- phase reports are written when a milestone, route, validation result, or risk changes;
+- each crew member's history folds into one profile, keeping the main office legible;
+- waiting states name what they are waiting for, and completion names the evidence.
 
-从 [`docs/PROJECT_CHARTER_TEMPLATE.md`](docs/PROJECT_CHARTER_TEMPLATE.md) 和 [`docs/TASK_BRIEF_TEMPLATE.md`](docs/TASK_BRIEF_TEMPLATE.md) 开始。完整方法见 [`AGENTS.md`](AGENTS.md) 与 [`docs/OPERATING_MODEL.md`](docs/OPERATING_MODEL.md)。
+Start with the **[Project Charter](docs/PROJECT_CHARTER_TEMPLATE.md)** and **[Task Brief](docs/TASK_BRIEF_TEMPLATE.md)** templates. Continue with **[AGENTS.md](AGENTS.md)** and the full **[Operating Model](docs/OPERATING_MODEL.md)**.
 
-## 配置地图
+## Privacy and trust
 
-| 字段 | 作用 |
+PixelCrew is intentionally local-first:
+
+- reads local Codex state and matching rollout records;
+- listens on `127.0.0.1` by default;
+- never modifies Codex tasks or executes project artifacts;
+- exposes local files only through configured artifact allowlists;
+- ignores local configs, generated output, and secretary caches in Git;
+- keeps the optional AI path explicit, temporary, redacted, and degradable.
+
+`pixelcrew.json` and `.pixelcrew/secretary.json` can contain local project context. **Do not commit them to a public repository.** See **[SECURITY.md](SECURITY.md)** for the threat model and reporting process.
+
+## Documentation
+
+| Guide | What it covers |
 |---|---|
-| `project.root` | 项目根目录，也是默认成果白名单 |
-| `project.manager_thread_id` | 可选：指定项目负责人任务 |
-| `discovery.workspace_match` | 按工作目录自动发现 Codex 任务 |
-| `discovery.title_keywords` | 可选：进一步限定任务标题 |
-| `roles` | 可选：给任务配置稳定角色名与职责 |
-| `artifacts.allowed_roots` | 允许展示的本地成果路径 |
-| `artifacts.remote_prefixes` | 可识别但不自动连接的远端路径 |
-| `secretary.enabled` | 是否在页面显示秘书能力 |
-| `secretary.cache` | 可选 AI 简报的本地缓存位置 |
+| [Quick Start](docs/QUICKSTART.md) | Install, initialize, diagnose, and serve |
+| [Architecture](docs/ARCHITECTURE.md) | Discovery, normalization, APIs, and rendering layers |
+| [Secretary Design](docs/SECRETARY.md) | Rule mode, AI mode, redaction, caching, and fallback |
+| [Operating Model](docs/OPERATING_MODEL.md) | Roles, delegation, reporting, evidence, and acceptance |
+| [Project Charter](docs/PROJECT_CHARTER_TEMPLATE.md) | Reusable project-level planning template |
+| [Task Brief](docs/TASK_BRIEF_TEMPLATE.md) | Reusable bounded-task template |
+| [Contributing](CONTRIBUTING.md) | Development workflow and contribution expectations |
+| [Security](SECURITY.md) | Trust boundaries and vulnerability reporting |
 
-完整示例见 [`pixelcrew.example.json`](pixelcrew.example.json)。
-
-## 数据与安全边界
-
-PixelCrew 默认只读 `~/.codex/state_5.sqlite`、`~/.codex/session_index.jsonl` 和对应 rollout 记录。服务只监听 `127.0.0.1`，不会启动、停止或修改 Codex 任务，也不会执行训练和成果文件。
-
-`pixelcrew.json`、`.pixelcrew/secretary.json` 可能含本地项目信息，已默认忽略，**不要提交到公开仓库**。更多威胁模型和报告渠道见 [`SECURITY.md`](SECURITY.md)，实现分层见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
-
-## 开发与验证
+## Develop
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -128,8 +188,8 @@ python3 -m py_compile src/pixelcrew/*.py
 python3 -m pip wheel . -w /tmp/pixelcrew-wheel
 ```
 
-欢迎读 [`CONTRIBUTING.md`](CONTRIBUTING.md) 后带着你的 Crew 来添砖加瓦。
+Contributions are welcome. Read **[CONTRIBUTING.md](CONTRIBUTING.md)**, bring your crew, and help make complex work easier to see.
 
 ## License
 
-MIT — 给你的 agents 盖一栋办公室吧。
+[MIT](LICENSE) — your agents deserve an office.
