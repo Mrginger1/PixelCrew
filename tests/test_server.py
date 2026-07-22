@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from pixelcrew.server import clean_markdown, load_config, path_artifacts, plan_progress
+from pixelcrew.server import build_insights, clean_markdown, extract_rollout, load_config, path_artifacts, plan_progress
 
 
 class ServerTests(unittest.TestCase):
@@ -38,6 +38,35 @@ class ServerTests(unittest.TestCase):
             "/home/user/site-packages/nope.py",
         ])
         self.assertEqual({item["path"] for item in rows}, {"/project/report.md", "/home/user/model.pt"})
+
+
+    def test_stage_reports_capture_milestones_and_decisions(self):
+        rows = [
+            {"timestamp": "2026-01-01T01:00:00Z", "payload": {"type": "function_call", "name": "update_plan", "arguments": json.dumps({"plan": [{"step": "实现", "status": "in_progress"}, {"step": "验证", "status": "pending"}]})}},
+            {"timestamp": "2026-01-01T02:00:00Z", "payload": {"type": "function_call", "name": "update_plan", "arguments": json.dumps({"explanation": "决定采用独立验证，核心实现已经完成。", "plan": [{"step": "实现", "status": "completed"}, {"step": "验证", "status": "in_progress"}]})}},
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            rollout = Path(tmp) / "rollout.jsonl"
+            rollout.write_text("\n".join(json.dumps(row, ensure_ascii=False) for row in rows))
+            result = extract_rollout(rollout)
+        self.assertEqual(len(result["stageReports"]), 2)
+        latest = result["stageReports"][-1]
+        self.assertEqual(latest["kind"], "decision")
+        self.assertEqual(latest["completed"], ["实现"])
+        self.assertEqual(latest["current"], "验证")
+        self.assertGreater(latest["delta"], 0)
+
+    def test_project_insights_measure_breadth_and_attention(self):
+        employees = [
+            {"id": "a", "name": "A", "status": "complete", "progress": 100, "plan": [{"step": "one", "status": "completed"}], "artifacts": [{"path": "/x"}], "stageReports": [{}], "updatedAt": "2999-01-01T00:00:00+00:00"},
+            {"id": "b", "name": "B", "status": "blocked", "progress": 20, "plan": [{"step": "two", "status": "in_progress"}], "artifacts": [], "stageReports": [], "updatedAt": "2999-01-01T00:00:00+00:00"},
+        ]
+        insights = build_insights(employees)
+        radar = {item["key"]: item["value"] for item in insights["radar"]}
+        self.assertEqual(radar["evidence"], 50)
+        self.assertEqual(radar["reporting"], 50)
+        self.assertFalse(insights["healthy"])
+        self.assertEqual(insights["attention"][0]["owner"], "B")
 
     def test_config_defaults_are_portable(self):
         with tempfile.TemporaryDirectory() as tmp:

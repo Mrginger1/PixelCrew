@@ -45,7 +45,28 @@
         "y": 254,
         "bubbleX": 50,
         "bubbleY": 49
-      }
+      },
+      "stageReports": [
+        {
+          "id": "stage-demo-2",
+          "timestamp": "2026-01-01T09:24:00+08:00",
+          "updatedLabel": "09:24",
+          "headline": "采用独立验证，而不是重复实现",
+          "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+          "kind": "decision",
+          "progress": 45,
+          "delta": 10,
+          "completed": [
+            "定义目标和验收标准"
+          ],
+          "current": "协调并行子任务",
+          "pending": 1,
+          "owner": "总负责人",
+          "taskId": "lead",
+          "status": "active",
+          "accent": "#dcb34c"
+        }
+      ]
     },
     {
       "id": "staff-2",
@@ -85,7 +106,28 @@
         "y": 195,
         "bubbleX": 22,
         "bubbleY": 33
-      }
+      },
+      "stageReports": [
+        {
+          "id": "stage-demo-3",
+          "timestamp": "2026-01-01T09:28:00+08:00",
+          "updatedLabel": "09:28",
+          "headline": "核心功能通过首轮验证",
+          "summary": "实现路径已经跑通，开始补齐自动测试和可复现交付说明。",
+          "kind": "milestone",
+          "progress": 58,
+          "delta": 25,
+          "completed": [
+            "实现核心功能"
+          ],
+          "current": "补齐自动测试",
+          "pending": 1,
+          "owner": "实现工程师",
+          "taskId": "staff-2",
+          "status": "active",
+          "accent": "#dcb34c"
+        }
+      ]
     },
     {
       "id": "staff-3",
@@ -125,7 +167,28 @@
         "y": 195,
         "bubbleX": 78,
         "bubbleY": 33
-      }
+      },
+      "stageReports": [
+        {
+          "id": "stage-demo-1",
+          "timestamp": "2026-01-01T09:20:00+08:00",
+          "updatedLabel": "09:20",
+          "headline": "验收清单已准备",
+          "summary": "验证范围、失败门槛和回归检查已明确，等待候选版本。",
+          "kind": "checkpoint",
+          "progress": 20,
+          "delta": 20,
+          "completed": [
+            "准备验收清单"
+          ],
+          "current": "等待候选版本",
+          "pending": 1,
+          "owner": "验证工程师",
+          "taskId": "staff-3",
+          "status": "waiting",
+          "accent": "#d69a48"
+        }
+      ]
     }
   ],
   "counts": {
@@ -136,5 +199,130 @@
     "idle": 0,
     "stale": 0
   },
-  "artifacts": []
+  "artifacts": [],
+  "recentReports": [
+    {
+      "id": "stage-demo-3",
+      "timestamp": "2026-01-01T09:28:00+08:00",
+      "updatedLabel": "09:28",
+      "headline": "核心功能通过首轮验证",
+      "summary": "实现路径已经跑通，开始补齐自动测试和可复现交付说明。",
+      "kind": "milestone",
+      "progress": 58,
+      "delta": 25,
+      "completed": [
+        "实现核心功能"
+      ],
+      "current": "补齐自动测试",
+      "pending": 1,
+      "owner": "实现工程师",
+      "taskId": "staff-2",
+      "status": "active",
+      "accent": "#dcb34c"
+    },
+    {
+      "id": "stage-demo-2",
+      "timestamp": "2026-01-01T09:24:00+08:00",
+      "updatedLabel": "09:24",
+      "headline": "采用独立验证，而不是重复实现",
+      "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+      "kind": "decision",
+      "progress": 45,
+      "delta": 10,
+      "completed": [
+        "定义目标和验收标准"
+      ],
+      "current": "协调并行子任务",
+      "pending": 1,
+      "owner": "总负责人",
+      "taskId": "lead",
+      "status": "active",
+      "accent": "#dcb34c"
+    },
+    {
+      "id": "stage-demo-1",
+      "timestamp": "2026-01-01T09:20:00+08:00",
+      "updatedLabel": "09:20",
+      "headline": "验收清单已准备",
+      "summary": "验证范围、失败门槛和回归检查已明确，等待候选版本。",
+      "kind": "checkpoint",
+      "progress": 20,
+      "delta": 20,
+      "completed": [
+        "准备验收清单"
+      ],
+      "current": "等待候选版本",
+      "pending": 1,
+      "owner": "验证工程师",
+      "taskId": "staff-3",
+      "status": "waiting",
+      "accent": "#d69a48"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "stage-demo-2",
+      "timestamp": "2026-01-01T09:24:00+08:00",
+      "updatedLabel": "09:24",
+      "headline": "采用独立验证，而不是重复实现",
+      "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+      "kind": "decision",
+      "progress": 45,
+      "delta": 10,
+      "completed": [
+        "定义目标和验收标准"
+      ],
+      "current": "协调并行子任务",
+      "pending": 1,
+      "owner": "总负责人",
+      "taskId": "lead",
+      "status": "active",
+      "accent": "#dcb34c"
+    }
+  ],
+  "insights": {
+    "briefing": "3 个任务中，2 个正在推进、1 个等待交付；结构化计划已完成 3/9 步。每个任务都已留下阶段报告，下一步是补齐测试证据并进入独立验收。",
+    "overallProgress": 41,
+    "path": {
+      "completed": 3,
+      "active": 3,
+      "pending": 3,
+      "total": 9
+    },
+    "radar": [
+      {
+        "key": "progress",
+        "label": "计划推进",
+        "value": 41,
+        "detail": "3 个步骤完成"
+      },
+      {
+        "key": "evidence",
+        "label": "成果证据",
+        "value": 67,
+        "detail": "2/3 个任务有交付物"
+      },
+      {
+        "key": "reporting",
+        "label": "阶段汇报",
+        "value": 100,
+        "detail": "3/3 个任务有报告"
+      },
+      {
+        "key": "freshness",
+        "label": "信息新鲜度",
+        "value": 100,
+        "detail": "3/3 在 24h 内更新"
+      }
+    ],
+    "attention": [
+      {
+        "level": "low",
+        "owner": "验证工程师",
+        "reason": "正在等待候选版本交付",
+        "taskId": "staff-3"
+      }
+    ],
+    "healthy": true
+  }
 }

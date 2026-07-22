@@ -110,6 +110,70 @@ def extract_paths(text: str) -> list[str]:
     return cleaned
 
 
+def _timestamp_label(value: str) -> str:
+    """Render rollout ISO timestamps in the machine's local timezone."""
+    try:
+        moment = datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone()
+        return moment.strftime("%m-%d %H:%M")
+    except (TypeError, ValueError):
+        return "时间未知"
+
+
+def _stage_kind(text: str, completed: list[str]) -> str:
+    lowered = text.lower()
+    decision_words = ("决定", "选择", "改为", "转为", "采用", "确认", "decision", "switch", "choose")
+    if any(word in lowered for word in decision_words):
+        return "decision"
+    if completed:
+        return "milestone"
+    return "checkpoint"
+
+
+def _stage_report(
+    timestamp: str,
+    explanation: str,
+    plan: list[dict[str, Any]],
+    previous_plan: list[dict[str, Any]],
+    sequence: int,
+) -> dict[str, Any]:
+    old_completed = {
+        str(item.get("step")) for item in previous_plan if item.get("status") == "completed"
+    }
+    completed = [
+        str(item.get("step")) for item in plan
+        if item.get("status") == "completed" and str(item.get("step")) not in old_completed
+    ]
+    current = next((str(item.get("step")) for item in plan if item.get("status") == "in_progress"), "")
+    pending = sum(1 for item in plan if item.get("status") == "pending")
+    previous_progress = plan_progress(previous_plan, "active") if previous_plan else 0
+    progress = plan_progress(plan, "active")
+    delta = max(0, progress - previous_progress)
+    if explanation:
+        headline = clean_markdown(explanation, 92)
+        summary = clean_markdown(explanation, 280)
+    elif completed:
+        headline = f"完成 {completed[-1]}"
+        summary = "本阶段完成：" + "、".join(completed[-3:])
+    elif current:
+        headline = f"进入 {current}"
+        summary = f"计划已更新，当前推进：{current}"
+    else:
+        headline, summary = "计划检查点", "任务计划已更新。"
+    return {
+        "id": f"stage-{sequence}",
+        "timestamp": timestamp,
+        "updatedLabel": _timestamp_label(timestamp),
+        "headline": headline,
+        "summary": summary,
+        "kind": _stage_kind(explanation, completed),
+        "progress": progress,
+        "delta": delta,
+        "completed": completed[-4:],
+        "current": current,
+        "pending": pending,
+    }
+
+
 def extract_rollout(path: Path) -> dict[str, Any]:
     latest_plan: list[dict[str, str]] = []
     explanation = ""
@@ -118,15 +182,29 @@ def extract_rollout(path: Path) -> dict[str, Any]:
     last_kind = ""
     paths: list[str] = []
     wandb_urls: list[str] = []
+    stage_reports: list[dict[str, Any]] = []
+    previous_plan: list[dict[str, Any]] = []
     for row in read_json_lines(path):
         payload = row.get("payload") or {}
         typ = str(payload.get("type") or "")
+        timestamp = str(row.get("timestamp") or "")
         last_kind = typ or last_kind
         if typ == "function_call" and payload.get("name") == "update_plan":
             try:
                 args = json.loads(payload.get("arguments") or "{}")
-                latest_plan = args.get("plan") or latest_plan
-                explanation = args.get("explanation") or explanation
+                candidate = args.get("plan") or latest_plan
+                note = str(args.get("explanation") or "")
+                changed = candidate != latest_plan
+                if candidate and (changed or note):
+                    report = _stage_report(timestamp, note, candidate, previous_plan or latest_plan, len(stage_reports) + 1)
+                    signature = (report["headline"], report["progress"], report["current"])
+                    if not stage_reports or signature != (
+                        stage_reports[-1]["headline"], stage_reports[-1]["progress"], stage_reports[-1]["current"]
+                    ):
+                        stage_reports.append(report)
+                    previous_plan = [dict(item) for item in candidate]
+                latest_plan = candidate
+                explanation = note or explanation
             except (json.JSONDecodeError, TypeError):
                 pass
         elif typ == "message" and payload.get("role") == "assistant":
@@ -153,6 +231,7 @@ def extract_rollout(path: Path) -> dict[str, Any]:
         "summary": clean_markdown(message, 320),
         "paths": list(dict.fromkeys(paths)),
         "wandb": list(dict.fromkeys(wandb_urls))[-5:],
+        "stageReports": stage_reports[-10:],
         "last_kind": last_kind,
     }
 
@@ -222,6 +301,72 @@ def path_artifacts(config: dict[str, Any], values: list[str]) -> list[dict[str, 
     return result[: int(settings.get("max_per_task", 8))]
 
 
+def _is_fresh(iso_value: str, hours: int = 24) -> bool:
+    try:
+        value = datetime.fromisoformat(iso_value)
+        return (datetime.now().astimezone() - value).total_seconds() <= hours * 3600
+    except (TypeError, ValueError):
+        return False
+
+
+def build_insights(employees: list[dict[str, Any]]) -> dict[str, Any]:
+    """Build deterministic portfolio-level signals without inventing project facts."""
+    count = len(employees)
+    plans = [item for employee in employees for item in employee.get("plan") or []]
+    completed_steps = sum(1 for item in plans if item.get("status") == "completed")
+    active_steps = sum(1 for item in plans if item.get("status") == "in_progress")
+    pending_steps = sum(1 for item in plans if item.get("status") == "pending")
+    progress = round(sum(employee.get("progress", 0) for employee in employees) / count) if count else 0
+    evidence_count = sum(bool(employee.get("artifacts")) for employee in employees)
+    reporting_count = sum(bool(employee.get("stageReports")) for employee in employees)
+    fresh_count = sum(_is_fresh(str(employee.get("updatedAt") or "")) for employee in employees)
+    coverage = lambda value: round(value * 100 / count) if count else 0
+
+    attention: list[dict[str, str]] = []
+    for employee in employees:
+        status = str(employee.get("status") or "idle")
+        if status == "blocked":
+            attention.append({"level": "high", "owner": employee["name"], "reason": "任务已阻塞，需要负责人处理", "taskId": employee["id"]})
+        elif status == "stale":
+            attention.append({"level": "medium", "owner": employee["name"], "reason": "超过 24 小时没有新汇报", "taskId": employee["id"]})
+        elif status == "waiting":
+            attention.append({"level": "low", "owner": employee["name"], "reason": "正在等待外部资源或交付", "taskId": employee["id"]})
+        if employee.get("status") == "complete" and not employee.get("artifacts"):
+            attention.append({"level": "medium", "owner": employee["name"], "reason": "任务已完成，但尚未识别到成果证据", "taskId": employee["id"]})
+        if not employee.get("plan"):
+            attention.append({"level": "low", "owner": employee["name"], "reason": "尚未建立结构化任务计划", "taskId": employee["id"]})
+    rank = {"high": 0, "medium": 1, "low": 2}
+    attention.sort(key=lambda item: rank[item["level"]])
+
+    blocked = sum(employee.get("status") == "blocked" for employee in employees)
+    stale = sum(employee.get("status") == "stale" for employee in employees)
+    active = sum(employee.get("status") == "active" for employee in employees)
+    waiting = sum(employee.get("status") == "waiting" for employee in employees)
+    briefing = (
+        f"{count} 个任务中，{active} 个正在推进、{waiting} 个等待资源；"
+        f"结构化计划已完成 {completed_steps}/{len(plans) or 0} 步。"
+        f"{evidence_count} 个任务提交了可识别成果，{reporting_count} 个留下阶段报告。"
+    )
+    if blocked or stale:
+        briefing += f"当前有 {blocked + stale} 项需要负责人优先关注。"
+    elif count:
+        briefing += "当前没有阻塞或超时任务。"
+
+    return {
+        "briefing": briefing,
+        "overallProgress": progress,
+        "path": {"completed": completed_steps, "active": active_steps, "pending": pending_steps, "total": len(plans)},
+        "radar": [
+            {"key": "progress", "label": "计划推进", "value": progress, "detail": f"{completed_steps} 个步骤完成"},
+            {"key": "evidence", "label": "成果证据", "value": coverage(evidence_count), "detail": f"{evidence_count}/{count} 个任务有交付物"},
+            {"key": "reporting", "label": "阶段汇报", "value": coverage(reporting_count), "detail": f"{reporting_count}/{count} 个任务有报告"},
+            {"key": "freshness", "label": "信息新鲜度", "value": coverage(fresh_count), "detail": f"{fresh_count}/{count} 在 24h 内更新"},
+        ],
+        "attention": attention[:8],
+        "healthy": not blocked and not stale,
+    }
+
+
 class Dashboard:
     def __init__(self, config: dict[str, Any]):
         self.config = config
@@ -260,6 +405,7 @@ class Dashboard:
         rows.sort(key=lambda row: (0 if str(row["id"]) == manager_id else 1, -int(row["updated_at"])))
         employees: list[dict[str, Any]] = []
         artifacts: list[dict[str, Any]] = []
+        recent_reports: list[dict[str, Any]] = []
         for index, row in enumerate(rows):
             thread_id = str(row["id"])
             title = names.get(thread_id, str(row["title"] or "").splitlines()[0])
@@ -270,7 +416,14 @@ class Dashboard:
             current = next((p.get("step") for p in plan if p.get("status") == "in_progress"), None)
             current = current or next((p.get("step") for p in plan if p.get("status") == "pending"), default_assignment)
             owned = path_artifacts(self.config, rollout.get("paths") or [])
-            artifacts.extend({**item, "owner": name} for item in owned)
+            updated_iso = datetime.fromtimestamp(int(row["updated_at"])).astimezone().isoformat(timespec="seconds")
+            updated_label = datetime.fromtimestamp(int(row["updated_at"])).strftime("%m-%d %H:%M")
+            artifacts.extend({**item, "owner": name, "taskId": role_id, "updatedAt": updated_iso, "updatedLabel": updated_label} for item in owned)
+            reports = [
+                {**report, "owner": name, "taskId": role_id, "status": status, "accent": PALETTES[index % len(PALETTES)][3]}
+                for report in rollout.get("stageReports") or []
+            ]
+            recent_reports.extend(reports)
             palette = PALETTES[index % len(PALETTES)]
             employees.append({
                 "id": role_id, "threadId": thread_id, "name": name, "title": title,
@@ -279,12 +432,17 @@ class Dashboard:
                 "bubble": rollout.get("bubble") or "正在整理当前任务进展…",
                 "summary": rollout.get("summary") or "暂无最新文字汇报。",
                 "plan": plan, "artifacts": owned, "wandb": rollout.get("wandb") or [],
-                "updatedAt": datetime.fromtimestamp(int(row["updated_at"])).astimezone().isoformat(timespec="seconds"),
-                "updatedLabel": datetime.fromtimestamp(int(row["updated_at"])).strftime("%m-%d %H:%M"),
+                "stageReports": reports,
+                "updatedAt": updated_iso,
+                "updatedLabel": updated_label,
                 "color": palette[0], "hair": palette[1], "shirt": palette[2], "accent": palette[3],
                 "slot": SLOTS[index % len(SLOTS)], "floor": index // len(SLOTS),
             })
         states = ("active", "waiting", "blocked", "complete", "idle", "stale", "archived")
+        recent_reports.sort(key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+        artifacts.sort(key=lambda item: str(item.get("updatedAt") or ""), reverse=True)
+        insights = build_insights(employees)
+        decisions = [report for report in recent_reports if report.get("kind") == "decision"][:8]
         return {
             "generatedAt": datetime.now().astimezone().isoformat(timespec="seconds"),
             "generatedLabel": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -292,13 +450,16 @@ class Dashboard:
             "project": {k: v for k, v in self.config["project"].items() if k not in {"root", "manager_thread_id"}},
             "employees": employees,
             "counts": {state: sum(1 for e in employees if e["status"] == state) for state in states},
+            "insights": insights,
+            "recentReports": recent_reports[:40],
+            "decisions": decisions,
             "artifacts": artifacts[:30],
         }
 
 
 def make_handler(dashboard: Dashboard, web_dir: Path):
     class Handler(BaseHTTPRequestHandler):
-        server_version = "PixelCrew/1.0"
+        server_version = "PixelCrew/1.1"
 
         def do_GET(self) -> None:
             parsed = urlparse(self.path)

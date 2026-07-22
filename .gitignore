@@ -7,3 +7,6 @@ build/
 pixelcrew.json
 status-snapshot.json
 .DS_Store
+
+# Local visual QA artifacts
+output/
