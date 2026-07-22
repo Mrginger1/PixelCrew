@@ -43,7 +43,7 @@ DEFAULT_IGNORES = ["/tmp/", "/.cache/", "/node_modules/", "/site-packages/", "/.
 def load_config(path: Path) -> dict[str, Any]:
     raw = json.loads(path.read_text(encoding="utf-8"))
     project = raw.setdefault("project", {})
-    project.setdefault("name", path.parent.name or "Agent Project")
+    project.setdefault("name", path.parent.name or "New Project")
     project.setdefault("subtitle", "负责人统筹 · 子任务并行 · 统一验收")
     root = Path(project.get("root") or path.parent).expanduser().resolve()
     project["root"] = str(root)
@@ -298,7 +298,7 @@ class Dashboard:
 
 def make_handler(dashboard: Dashboard, web_dir: Path):
     class Handler(BaseHTTPRequestHandler):
-        server_version = "AgentProjectHQ/1.0"
+        server_version = "PixelCrew/1.0"
 
         def do_GET(self) -> None:
             parsed = urlparse(self.path)
@@ -336,7 +336,7 @@ def make_handler(dashboard: Dashboard, web_dir: Path):
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Pixel office dashboard for Codex project tasks")
-    parser.add_argument("--config", type=Path, default=Path("project-hq.json"))
+    parser.add_argument("--config", type=Path, default=Path("pixelcrew.json"))
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--snapshot", action="store_true")
@@ -347,7 +347,7 @@ def main(argv: list[str] | None = None) -> None:
         print(json.dumps(dashboard.snapshot(), ensure_ascii=False, indent=2))
         return
     server = ThreadingHTTPServer((args.host, args.port), make_handler(dashboard, DEFAULT_WEB_DIR))
-    print(f"Agent Project HQ: http://{args.host}:{args.port}")
+    print(f"PixelCrew: http://{args.host}:{args.port}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

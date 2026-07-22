@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from agent_project_hq.server import clean_markdown, load_config, path_artifacts, plan_progress
+from pixelcrew.server import clean_markdown, load_config, path_artifacts, plan_progress
 
 
 class ServerTests(unittest.TestCase):
@@ -42,7 +42,7 @@ class ServerTests(unittest.TestCase):
     def test_config_defaults_are_portable(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            config_path = root / "project-hq.json"
+            config_path = root / "pixelcrew.json"
             config_path.write_text(json.dumps({"project": {"name": "Demo", "root": tmp}}))
             config = load_config(config_path)
             self.assertEqual(config["project"]["name"], "Demo")

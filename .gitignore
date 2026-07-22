@@ -4,6 +4,6 @@ __pycache__/
 dist/
 build/
 *.egg-info/
-project-hq.json
+pixelcrew.json
 status-snapshot.json
 .DS_Store

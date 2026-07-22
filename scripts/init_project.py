@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("project_root", type=Path)
 parser.add_argument("--name")
 parser.add_argument("--manager-thread-id", default="")
-parser.add_argument("--output", type=Path, default=Path("project-hq.json"))
+parser.add_argument("--output", type=Path, default=Path("pixelcrew.json"))
 args = parser.parse_args()
 root = args.project_root.expanduser().resolve()
 config = {

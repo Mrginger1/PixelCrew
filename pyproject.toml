@@ -3,17 +3,17 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-project-hq"
+name = "pixelcrew"
 version = "0.1.0"
 description = "A read-only pixel office dashboard and operating model for Codex multi-task projects"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-authors = [{name = "Agent Project HQ contributors"}]
+authors = [{name = "PixelCrew contributors"}]
 dependencies = []
 
 [project.scripts]
-agent-project-hq = "agent_project_hq.server:main"
+pixelcrew = "pixelcrew.server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
