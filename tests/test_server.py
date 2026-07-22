@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from pixelcrew.server import build_insights, clean_markdown, extract_rollout, load_config, path_artifacts, plan_progress
+from pixelcrew.server import build_crew_report, build_insights, clean_markdown, extract_rollout, load_config, path_artifacts, plan_progress
 
 
 class ServerTests(unittest.TestCase):
@@ -55,6 +55,24 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(latest["completed"], ["实现"])
         self.assertEqual(latest["current"], "验证")
         self.assertGreater(latest["delta"], 0)
+
+    def test_crew_report_collapses_history_into_one_dossier(self):
+        employee = {
+            "id": "worker", "threadId": "thread", "name": "实现工程师", "title": "实现功能",
+            "status": "active", "statusLabel": "工作中", "progress": 60, "updatedLabel": "刚刚",
+            "assignment": "补齐测试", "summary": "最新汇报", "color": "#123", "accent": "#456",
+            "plan": [{"step": "实现", "status": "completed"}, {"step": "交付", "status": "pending"}],
+            "artifacts": [{"path": "/project/result.md"}],
+            "stageReports": [
+                {"timestamp": "2026-01-01T01:00:00Z", "kind": "milestone", "headline": "实现完成", "summary": "核心功能完成", "completed": ["实现"], "current": "测试"},
+                {"timestamp": "2026-01-01T02:00:00Z", "kind": "decision", "headline": "采用独立验证", "summary": "交给验证成员", "completed": [], "current": "补齐测试"},
+            ],
+        }
+        report = build_crew_report(employee)
+        self.assertEqual(report["latestHeadline"], "采用独立验证")
+        self.assertEqual(report["outcomes"], ["实现"])
+        self.assertEqual(report["nextSteps"], ["交付"])
+        self.assertEqual(report["stats"], {"reports": 2, "milestones": 1, "decisions": 1, "evidence": 1})
 
     def test_project_insights_measure_breadth_and_attention(self):
         employees = [

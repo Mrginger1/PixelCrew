@@ -367,6 +367,53 @@ def build_insights(employees: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def build_crew_report(employee: dict[str, Any]) -> dict[str, Any]:
+    """Collapse a Crew member's checkpoints into one readable stage dossier."""
+    reports = list(employee.get("stageReports") or [])
+    history = sorted(reports, key=lambda item: str(item.get("timestamp") or ""), reverse=True)
+    latest = history[0] if history else {}
+    outcomes: list[str] = []
+    for report in history:
+        for step in report.get("completed") or []:
+            if step and step not in outcomes:
+                outcomes.append(str(step))
+    for step in employee.get("plan") or []:
+        value = str(step.get("step") or "")
+        if step.get("status") == "completed" and value and value not in outcomes:
+            outcomes.append(value)
+    pending_steps = [
+        str(step.get("step")) for step in employee.get("plan") or []
+        if step.get("status") == "pending" and step.get("step")
+    ]
+    decisions = [report for report in history if report.get("kind") == "decision"]
+    return {
+        "taskId": employee.get("id"),
+        "threadId": employee.get("threadId"),
+        "owner": employee.get("name"),
+        "title": employee.get("title"),
+        "status": employee.get("status"),
+        "statusLabel": employee.get("statusLabel"),
+        "progress": employee.get("progress", 0),
+        "updatedLabel": employee.get("updatedLabel"),
+        "latestHeadline": latest.get("headline") or employee.get("assignment") or "尚未提交阶段报告",
+        "summary": latest.get("summary") or employee.get("summary") or "暂无阶段总结。",
+        "current": latest.get("current") or employee.get("assignment") or "",
+        "outcomes": outcomes[:8],
+        "nextSteps": pending_steps[:5],
+        "artifacts": list(employee.get("artifacts") or [])[:6],
+        "history": history[:5],
+        "decisions": decisions[:4],
+        "stats": {
+            "reports": len(reports),
+            "milestones": sum(report.get("kind") == "milestone" for report in reports),
+            "decisions": len(decisions),
+            "evidence": len(employee.get("artifacts") or []),
+        },
+        "color": employee.get("color"),
+        "accent": employee.get("accent"),
+    }
+
+
 class Dashboard:
     def __init__(self, config: dict[str, Any]):
         self.config = config
@@ -443,6 +490,7 @@ class Dashboard:
         artifacts.sort(key=lambda item: str(item.get("updatedAt") or ""), reverse=True)
         insights = build_insights(employees)
         decisions = [report for report in recent_reports if report.get("kind") == "decision"][:8]
+        crew_reports = [build_crew_report(employee) for employee in employees]
         return {
             "generatedAt": datetime.now().astimezone().isoformat(timespec="seconds"),
             "generatedLabel": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -452,6 +500,7 @@ class Dashboard:
             "counts": {state: sum(1 for e in employees if e["status"] == state) for state in states},
             "insights": insights,
             "recentReports": recent_reports[:40],
+            "crewReports": crew_reports,
             "decisions": decisions,
             "artifacts": artifacts[:30],
         }

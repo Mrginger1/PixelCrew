@@ -259,6 +259,178 @@
       "accent": "#d69a48"
     }
   ],
+  "crewReports": [
+    {
+      "taskId": "lead",
+      "threadId": "demo-lead",
+      "owner": "总负责人",
+      "title": "规划项目目标与验收门槛",
+      "status": "active",
+      "statusLabel": "统筹中",
+      "progress": 45,
+      "updatedLabel": "刚刚",
+      "latestHeadline": "采用独立验证，而不是重复实现",
+      "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+      "current": "协调并行子任务",
+      "outcomes": [
+        "定义目标和验收标准"
+      ],
+      "nextSteps": [
+        "统一验收与归档"
+      ],
+      "artifacts": [],
+      "history": [
+        {
+          "id": "stage-demo-2",
+          "timestamp": "2026-01-01T09:24:00+08:00",
+          "updatedLabel": "09:24",
+          "headline": "采用独立验证，而不是重复实现",
+          "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+          "kind": "decision",
+          "progress": 45,
+          "delta": 10,
+          "completed": [
+            "定义目标和验收标准"
+          ],
+          "current": "协调并行子任务",
+          "pending": 1,
+          "owner": "总负责人",
+          "taskId": "lead",
+          "status": "active",
+          "accent": "#dcb34c"
+        }
+      ],
+      "decisions": [
+        {
+          "id": "stage-demo-2",
+          "timestamp": "2026-01-01T09:24:00+08:00",
+          "updatedLabel": "09:24",
+          "headline": "采用独立验证，而不是重复实现",
+          "summary": "关键交付由验证 Crew 按失败门槛复核，负责人只接收可复现证据。",
+          "kind": "decision",
+          "progress": 45,
+          "delta": 10,
+          "completed": [
+            "定义目标和验收标准"
+          ],
+          "current": "协调并行子任务",
+          "pending": 1,
+          "owner": "总负责人",
+          "taskId": "lead",
+          "status": "active",
+          "accent": "#dcb34c"
+        }
+      ],
+      "stats": {
+        "reports": 1,
+        "milestones": 0,
+        "decisions": 1,
+        "evidence": 0
+      },
+      "color": "#4c8064",
+      "accent": "#dcb34c"
+    },
+    {
+      "taskId": "staff-2",
+      "threadId": "demo-worker",
+      "owner": "实现工程师",
+      "title": "实现独立交付物",
+      "status": "active",
+      "statusLabel": "工作中",
+      "progress": 58,
+      "updatedLabel": "2 分钟前",
+      "latestHeadline": "核心功能通过首轮验证",
+      "summary": "实现路径已经跑通，开始补齐自动测试和可复现交付说明。",
+      "current": "补齐自动测试",
+      "outcomes": [
+        "实现核心功能"
+      ],
+      "nextSteps": [
+        "提交验收"
+      ],
+      "artifacts": [],
+      "history": [
+        {
+          "id": "stage-demo-3",
+          "timestamp": "2026-01-01T09:28:00+08:00",
+          "updatedLabel": "09:28",
+          "headline": "核心功能通过首轮验证",
+          "summary": "实现路径已经跑通，开始补齐自动测试和可复现交付说明。",
+          "kind": "milestone",
+          "progress": 58,
+          "delta": 25,
+          "completed": [
+            "实现核心功能"
+          ],
+          "current": "补齐自动测试",
+          "pending": 1,
+          "owner": "实现工程师",
+          "taskId": "staff-2",
+          "status": "active",
+          "accent": "#dcb34c"
+        }
+      ],
+      "decisions": [],
+      "stats": {
+        "reports": 1,
+        "milestones": 1,
+        "decisions": 0,
+        "evidence": 0
+      },
+      "color": "#c18635",
+      "accent": "#5d7994"
+    },
+    {
+      "taskId": "staff-3",
+      "threadId": "demo-review",
+      "owner": "验证工程师",
+      "title": "独立验证与风险审计",
+      "status": "waiting",
+      "statusLabel": "等待交付",
+      "progress": 20,
+      "updatedLabel": "10 分钟前",
+      "latestHeadline": "验收清单已准备",
+      "summary": "验证范围、失败门槛和回归检查已明确，等待候选版本。",
+      "current": "等待候选版本",
+      "outcomes": [
+        "准备验收清单"
+      ],
+      "nextSteps": [
+        "完成独立验证"
+      ],
+      "artifacts": [],
+      "history": [
+        {
+          "id": "stage-demo-1",
+          "timestamp": "2026-01-01T09:20:00+08:00",
+          "updatedLabel": "09:20",
+          "headline": "验收清单已准备",
+          "summary": "验证范围、失败门槛和回归检查已明确，等待候选版本。",
+          "kind": "checkpoint",
+          "progress": 20,
+          "delta": 20,
+          "completed": [
+            "准备验收清单"
+          ],
+          "current": "等待候选版本",
+          "pending": 1,
+          "owner": "验证工程师",
+          "taskId": "staff-3",
+          "status": "waiting",
+          "accent": "#d69a48"
+        }
+      ],
+      "decisions": [],
+      "stats": {
+        "reports": 1,
+        "milestones": 0,
+        "decisions": 0,
+        "evidence": 0
+      },
+      "color": "#527895",
+      "accent": "#d69a48"
+    }
+  ],
   "decisions": [
     {
       "id": "stage-demo-2",
