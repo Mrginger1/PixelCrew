@@ -1,0 +1,27 @@
+{
+  "project": {
+    "name": "My Agent Project",
+    "subtitle": "负责人统筹 · 子任务并行 · 统一验收",
+    "root": "/absolute/path/to/your/project",
+    "manager_thread_id": "optional-codex-thread-id"
+  },
+  "discovery": {
+    "workspace_match": "/absolute/path/to/your/project",
+    "include_archived": false,
+    "title_keywords": [],
+    "exclude_title_patterns": []
+  },
+  "roles": {
+    "optional-codex-thread-id": {
+      "id": "lead",
+      "name": "总负责人",
+      "assignment": "项目规划、协调与统一验收"
+    }
+  },
+  "artifacts": {
+    "allowed_roots": ["/absolute/path/to/your/project"],
+    "remote_prefixes": ["/home/", "/workspace/"],
+    "ignore_contains": ["/tmp/", "/.cache/", "/node_modules/", "/site-packages/"],
+    "max_per_task": 8
+  }
+}

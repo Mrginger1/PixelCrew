@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-01-01T09:30:00+08:00",
+  "generatedLabel": "DEMO SNAPSHOT",
+  "source": "Codex 本地任务记录（只读）",
+  "project": {
+    "name": "示例项目",
+    "subtitle": "负责人统筹 · 子任务并行 · 统一验收"
+  },
+  "employees": [
+    {
+      "id": "lead",
+      "threadId": "demo-lead",
+      "name": "总负责人",
+      "title": "规划项目目标与验收门槛",
+      "assignment": "拆解里程碑并协调各子任务",
+      "status": "active",
+      "statusLabel": "统筹中",
+      "progress": 45,
+      "bubble": "已完成任务拆解，正在核对两个子任务的验收结果。",
+      "summary": "负责人维护总计划、依赖关系与最终验收，不替代执行成员的细节工作。",
+      "plan": [
+        {
+          "step": "定义目标和验收标准",
+          "status": "completed"
+        },
+        {
+          "step": "协调并行子任务",
+          "status": "in_progress"
+        },
+        {
+          "step": "统一验收与归档",
+          "status": "pending"
+        }
+      ],
+      "artifacts": [],
+      "wandb": [],
+      "updatedAt": "2026-01-01T09:30:00+08:00",
+      "updatedLabel": "刚刚",
+      "color": "#4c8064",
+      "hair": "#26364b",
+      "shirt": "#46765e",
+      "accent": "#dcb34c",
+      "slot": {
+        "x": 320,
+        "y": 254,
+        "bubbleX": 50,
+        "bubbleY": 49
+      }
+    },
+    {
+      "id": "staff-2",
+      "threadId": "demo-worker",
+      "name": "实现工程师",
+      "title": "实现独立交付物",
+      "assignment": "完成当前工作包并附带验证证据",
+      "status": "active",
+      "statusLabel": "工作中",
+      "progress": 58,
+      "bubble": "核心功能已经跑通，正在补测试和交付说明。",
+      "summary": "子任务范围清晰，写入区域独立；完成后向负责人提交成果、验证方式和遗留风险。",
+      "plan": [
+        {
+          "step": "实现核心功能",
+          "status": "completed"
+        },
+        {
+          "step": "补齐自动测试",
+          "status": "in_progress"
+        },
+        {
+          "step": "提交验收",
+          "status": "pending"
+        }
+      ],
+      "artifacts": [],
+      "wandb": [],
+      "updatedAt": "2026-01-01T09:28:00+08:00",
+      "updatedLabel": "2 分钟前",
+      "color": "#c18635",
+      "hair": "#6d4638",
+      "shirt": "#c08536",
+      "accent": "#5d7994",
+      "slot": {
+        "x": 147,
+        "y": 195,
+        "bubbleX": 22,
+        "bubbleY": 33
+      }
+    },
+    {
+      "id": "staff-3",
+      "threadId": "demo-review",
+      "name": "验证工程师",
+      "title": "独立验证与风险审计",
+      "assignment": "复核结果并记录可复现证据",
+      "status": "waiting",
+      "statusLabel": "等待交付",
+      "progress": 20,
+      "bubble": "验收清单已准备，等待实现工程师交付候选版本。",
+      "summary": "验证成员不重复实现，专注可复现测试、失败门槛与回归风险。",
+      "plan": [
+        {
+          "step": "准备验收清单",
+          "status": "completed"
+        },
+        {
+          "step": "等待候选版本",
+          "status": "in_progress"
+        },
+        {
+          "step": "完成独立验证",
+          "status": "pending"
+        }
+      ],
+      "artifacts": [],
+      "wandb": [],
+      "updatedAt": "2026-01-01T09:20:00+08:00",
+      "updatedLabel": "10 分钟前",
+      "color": "#527895",
+      "hair": "#4b3f59",
+      "shirt": "#527895",
+      "accent": "#d69a48",
+      "slot": {
+        "x": 493,
+        "y": 195,
+        "bubbleX": 78,
+        "bubbleY": 33
+      }
+    }
+  ],
+  "counts": {
+    "active": 2,
+    "waiting": 1,
+    "blocked": 0,
+    "complete": 0,
+    "idle": 0,
+    "stale": 0
+  },
+  "artifacts": []
+}
