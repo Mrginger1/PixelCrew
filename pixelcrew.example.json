@@ -19,9 +19,24 @@
     }
   },
   "artifacts": {
-    "allowed_roots": ["/absolute/path/to/your/project"],
-    "remote_prefixes": ["/home/", "/workspace/"],
-    "ignore_contains": ["/tmp/", "/.cache/", "/node_modules/", "/site-packages/"],
+    "allowed_roots": [
+      "/absolute/path/to/your/project"
+    ],
+    "remote_prefixes": [
+      "/home/",
+      "/workspace/"
+    ],
+    "ignore_contains": [
+      "/tmp/",
+      "/.cache/",
+      "/node_modules/",
+      "/site-packages/"
+    ],
     "max_per_task": 8
+  },
+  "secretary": {
+    "enabled": true,
+    "cache": "/absolute/path/to/your/project/.pixelcrew/secretary.json",
+    "max_age_minutes": 180
   }
 }

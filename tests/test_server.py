@@ -3,8 +3,11 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from pixelcrew.cli import create_config
+from pixelcrew.secretary import build_secretary, run_codex_secretary, secretary_payload
 from pixelcrew.server import build_crew_report, build_insights, clean_markdown, extract_rollout, load_config, path_artifacts, plan_progress
 
 
@@ -86,6 +89,61 @@ class ServerTests(unittest.TestCase):
         self.assertFalse(insights["healthy"])
         self.assertEqual(insights["attention"][0]["owner"], "B")
 
+    def test_secretary_has_factual_fallback_and_sanitizes_paths(self):
+        snapshot = {
+            "generatedAt": "2026-01-01T00:00:00Z", "generatedLabel": "刚刚",
+            "employees": [{"id": "staff-1", "threadId": "12345678-1234-1234-1234-123456789abc",
+                           "name": "Worker", "title": "Task", "status": "active", "progress": 50,
+                           "summary": "See /private/report.md and " + "sk-" + "abcdefghijklmnop",
+                           "plan": [{"step": "Test", "status": "in_progress"}],
+                           "artifacts": [{"path": "/private/model.pt", "label": "model.pt", "kind": "model"}],
+                           "stageReports": []}],
+            "insights": {"briefing": "One task is active.", "attention": [
+                {"level": "low", "owner": "Worker", "reason": "Check it", "taskId": "staff-1"}
+            ]},
+        }
+        memo = build_secretary(snapshot, {"enabled": True, "cache": "/does/not/exist"})
+        self.assertEqual(memo["mode"], "automatic")
+        self.assertIn("Worker", memo["nextActions"][0])
+        payload = json.dumps(secretary_payload(snapshot))
+        self.assertNotIn("/private/model.pt", payload)
+        self.assertNotIn("/private/report.md", payload)
+        self.assertNotIn("12345678-1234-1234-1234-123456789abc", payload)
+        self.assertNotIn("sk-" + "abcdefghijklmnop", payload)
+        self.assertNotIn("taskId", payload)
+        self.assertIn("model.pt", payload)
+
+    def test_codex_secretary_is_ephemeral_read_only_and_redacts_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "secretary.json"
+
+            def fake_run(command, **kwargs):
+                self.assertLess(command.index("--ask-for-approval"), command.index("exec"))
+                self.assertIn("read-only", command)
+                self.assertIn("--ephemeral", command)
+                self.assertNotIn("--ignore-user-config", command)
+                self.assertIn("--ignore-rules", command)
+                message = Path(command[command.index("--output-last-message") + 1])
+                message.write_text(json.dumps({
+                    "headline": "Read /private/plan.md",
+                    "briefing": "Token " + "sk-" + "abcdefghijklmnop",
+                    "risks": [], "nextActions": [], "questions": [],
+                }))
+                return mock.Mock(returncode=0, stdout="", stderr="")
+
+            with mock.patch("pixelcrew.secretary.subprocess.run", side_effect=fake_run):
+                memo = run_codex_secretary({}, output, Path(tmp), codex_executable="codex")
+            self.assertNotIn("/private/plan.md", memo["headline"])
+            self.assertNotIn("sk-" + "abcdefghijklmnop", memo["briefing"])
+            self.assertTrue(output.is_file())
+
+    def test_generated_config_enables_opt_in_secretary_cache(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config = create_config(Path(tmp), "Demo")
+            self.assertEqual(config["project"]["name"], "Demo")
+            self.assertTrue(config["secretary"]["enabled"])
+            self.assertTrue(config["secretary"]["cache"].endswith(".pixelcrew/secretary.json"))
+
     def test_config_defaults_are_portable(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -95,6 +153,7 @@ class ServerTests(unittest.TestCase):
             self.assertEqual(config["project"]["name"], "Demo")
             self.assertEqual(config["discovery"]["workspace_match"], str(root.resolve()))
             self.assertEqual(config["artifacts"]["allowed_roots"], [str(root.resolve())])
+            self.assertTrue(config["secretary"]["enabled"])
 
 
 if __name__ == "__main__":

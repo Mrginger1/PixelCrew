@@ -14,8 +14,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlparse
 
+from .secretary import build_secretary
+
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_WEB_DIR = PACKAGE_ROOT / "web"
+DEFAULT_WEB_DIR = Path(__file__).resolve().parent / "web"
 DEFAULT_CODEX_HOME = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
 
 PALETTES = [
@@ -63,6 +65,10 @@ def load_config(path: Path) -> dict[str, Any]:
     codex["home"] = str(codex_home)
     codex.setdefault("state_db", str(codex_home / "state_5.sqlite"))
     codex.setdefault("session_index", str(codex_home / "session_index.jsonl"))
+    secretary = raw.setdefault("secretary", {})
+    secretary.setdefault("enabled", True)
+    secretary.setdefault("cache", str(root / ".pixelcrew" / "secretary.json"))
+    secretary.setdefault("max_age_minutes", 180)
     return raw
 
 
@@ -401,8 +407,8 @@ def build_crew_report(employee: dict[str, Any]) -> dict[str, Any]:
         "outcomes": outcomes[:8],
         "nextSteps": pending_steps[:5],
         "artifacts": list(employee.get("artifacts") or [])[:6],
-        "history": history[:5],
-        "decisions": decisions[:4],
+        "history": history[:20],
+        "decisions": decisions[:8],
         "stats": {
             "reports": len(reports),
             "milestones": sum(report.get("kind") == "milestone" for report in reports),
@@ -491,7 +497,7 @@ class Dashboard:
         insights = build_insights(employees)
         decisions = [report for report in recent_reports if report.get("kind") == "decision"][:8]
         crew_reports = [build_crew_report(employee) for employee in employees]
-        return {
+        snapshot = {
             "generatedAt": datetime.now().astimezone().isoformat(timespec="seconds"),
             "generatedLabel": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "source": "Codex 本地任务记录（只读）",
@@ -504,6 +510,8 @@ class Dashboard:
             "decisions": decisions,
             "artifacts": artifacts[:30],
         }
+        snapshot["secretary"] = build_secretary(snapshot, self.config.get("secretary") or {})
+        return snapshot
 
 
 def make_handler(dashboard: Dashboard, web_dir: Path):

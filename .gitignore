@@ -10,3 +10,6 @@ status-snapshot.json
 
 # Local visual QA artifacts
 output/
+
+# Local AI secretary memo
+.pixelcrew/

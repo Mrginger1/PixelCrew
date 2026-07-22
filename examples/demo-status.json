@@ -496,5 +496,22 @@
       }
     ],
     "healthy": true
+  },
+  "secretary": {
+    "enabled": true,
+    "mode": "automatic",
+    "sourceLabel": "规则秘书 · 无额外模型调用",
+    "headline": "3 名 Crew 正在推进，0 名已完成",
+    "briefing": "3 个任务中，2 个正在推进、1 个等待交付；结构化计划已完成 3/9 步。每个任务都已留下阶段报告，下一步是补齐测试证据并进入独立验收。",
+    "risks": [],
+    "nextActions": [
+      "验证工程师：正在等待候选版本交付"
+    ],
+    "questions": [
+      "验证工程师正在等待，是否需要协调外部输入？"
+    ],
+    "generatedAt": "2026-01-01T09:30:00+08:00",
+    "generatedLabel": "DEMO SNAPSHOT",
+    "stale": false
   }
 }
