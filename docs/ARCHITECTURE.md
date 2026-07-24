@@ -27,7 +27,7 @@ flowchart LR
 
 - `server.py`：配置默认值、Codex 状态采集、rollout 解析、进度/成果/阶段报告聚合和只读 HTTP 服务。
 - `secretary.py`：规则简报、模型输入脱敏、临时只读 Codex 调用和原子缓存。
-- `cli.py`：`init`、`doctor`、`snapshot`、`serve`、`secretary`。
+- `cli.py`：`init`、`doctor`、`snapshot`、`start/status/open/stop`、`serve`、`secretary`。
 - `web/index.html`：无构建步骤的单页办公室，包含员工档案和记录详情弹窗。
 - `web/icon.svg`：站点 favicon 与像素秘书头像。
 

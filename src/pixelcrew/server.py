@@ -514,7 +514,7 @@ class Dashboard:
         return snapshot
 
 
-def make_handler(dashboard: Dashboard, web_dir: Path):
+def make_handler(dashboard: Dashboard, web_dir: Path, process_token: str | None = None):
     class Handler(BaseHTTPRequestHandler):
         server_version = "PixelCrew/1.1"
 
@@ -542,6 +542,8 @@ def make_handler(dashboard: Dashboard, web_dir: Path):
             self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Cache-Control", "no-store")
+            if process_token:
+                self.send_header("X-PixelCrew-Process-Token", process_token)
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -558,13 +560,14 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--snapshot", action="store_true")
+    parser.add_argument("--process-token", help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
     config = load_config(args.config.resolve())
     dashboard = Dashboard(config)
     if args.snapshot:
         print(json.dumps(dashboard.snapshot(), ensure_ascii=False, indent=2))
         return
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(dashboard, DEFAULT_WEB_DIR))
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(dashboard, DEFAULT_WEB_DIR, args.process_token))
     print(f"PixelCrew: http://{args.host}:{args.port}")
     try:
         server.serve_forever()

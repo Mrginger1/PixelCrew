@@ -1,0 +1,65 @@
+name: "🐛 Bug report / 缺陷报告"
+description: "Report a reproducible PixelCrew problem / 报告可复现的问题"
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove task IDs, private paths, tokens, and real project content before posting logs or screenshots.
+        发布日志或截图前，请移除任务 ID、私有路径、令牌和真实项目内容。
+  - type: input
+    id: version
+    attributes:
+      label: "PixelCrew version / 版本"
+      placeholder: "0.4.0 or commit SHA"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Area / 模块"
+      options:
+        - Install or init / 安装或初始化
+        - Start, status, open, or stop / 服务生命周期
+        - Task discovery / 任务发现
+        - Office UI / 办公室界面
+        - Reports or artifacts / 报告或成果
+        - Secretary / 秘书
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Reproduction / 复现步骤"
+      placeholder: "1. Run... 2. Open... 3. Observe..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected behavior / 预期行为"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: "Actual behavior / 实际行为"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: "Environment / 环境"
+      placeholder: "macOS/Linux, Python version, Codex Desktop/CLI — redact private data"
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checks / 检查"
+      options:
+        - label: "I ran `pixelcrew doctor` / 我已运行 `pixelcrew doctor`"
+        - label: "I removed private project data / 我已移除私有项目数据"
+          required: true

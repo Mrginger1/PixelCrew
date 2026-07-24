@@ -10,6 +10,12 @@
 4. UI 修改请同时检查桌面与窄屏，并附截图。
 5. 行为修改请补单元测试和文档。
 
+## 从需求到开发
+
+提交功能前，请先使用 GitHub 的“Product idea / 功能建议”模板描述用户问题、受影响用户和期望结果。产品负责人会按 [`docs/product/ITERATION_PROCESS.md`](docs/product/ITERATION_PROCESS.md) 将需求置于 `Inbox / Discovery / Ready / Delivery / Validation / Shipped`；只有满足 Definition of Ready 的需求才进入迭代。
+
+优先阅读 [`docs/product/PRODUCT_REQUIREMENTS.md`](docs/product/PRODUCT_REQUIREMENTS.md) 与 [`docs/product/ROADMAP.md`](docs/product/ROADMAP.md)。路线图不是功能许愿池：提案应说明它为何比当前 P0/P1 更重要，且不能破坏 local-first、read-only 和默认不依赖 LLM 的边界。
+
 ## 本地检查
 
 ```bash

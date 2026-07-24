@@ -4,7 +4,8 @@
 
 ```mermaid
 flowchart TD
-  U[用户 / 目标所有者] --> L[总规划项目负责人]
+  U[用户 / Product Owner] --> PM[产品负责人：问题、需求与优先级]
+  PM --> L[总规划项目负责人：计划、依赖与验收]
   L --> P[计划与依赖图]
   P --> W1[执行任务 A]
   P --> W2[执行任务 B]
@@ -14,10 +15,11 @@ flowchart TD
   W3 --> V
   V --> L
   L --> R[集成、决策记录、成果归档]
-  R --> U
+  R --> PM
+  PM --> U
 ```
 
-总负责人拥有“目标和验收”，执行成员拥有“有界工作包”，验证成员拥有“独立证据”。
+产品负责人拥有“问题和优先级”，总负责人拥有“计划和验收”，执行成员拥有“有界工作包”，验证成员拥有“独立证据”。
 
 ## 2. 五层信息模型
 
@@ -101,3 +103,10 @@ stateDiagram-v2
 4. 复制 Charter 与任务简报模板，而不是复制真实任务 ID；
 5. 保持成果白名单和秘书缓存位于新项目内部；
 6. 启动 `serve` 后让新任务自动入驻。
+## 10. 产品需求与迭代
+
+PixelCrew 项目建议设立独立产品负责人：用户或 Product Owner 决定最终目标，产品负责人维护问题定义、需求证据与优先级，总负责人维护交付计划、依赖和统一验收。三者不能由项目秘书替代。
+
+需求按 `Inbox → Discovery → Ready → Delivery → Validation → Shipped → Observe` 流转。进入开发前必须明确目标用户、问题证据、范围、非目标、验收标准和隐私边界；完成代码并不等于需求完成，只有通过独立验证、文档同步和用户结果复核后才可标记 `Shipped`。
+
+完整规则见 [`product/PRODUCT_MANAGER.md`](product/PRODUCT_MANAGER.md) 与 [`product/ITERATION_PROCESS.md`](product/ITERATION_PROCESS.md)。

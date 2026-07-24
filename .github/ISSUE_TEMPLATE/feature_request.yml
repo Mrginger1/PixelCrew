@@ -1,0 +1,47 @@
+name: "💡 Product idea / 功能建议"
+description: "Describe a user problem before proposing a solution / 请先描述用户问题，再提出方案"
+title: "[Idea] "
+labels: ["product", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping PixelCrew improve. Please do not include real Codex task IDs, private absolute paths, tokens, or project snapshots.
+        感谢帮助 PixelCrew 改进。请勿填写真实 Codex 任务 ID、私有绝对路径、令牌或项目快照。
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem / 遇到的问题"
+      description: "What were you trying to accomplish, and what made it difficult? / 你想完成什么？哪里让你受阻？"
+      placeholder: "When I..., I need..., but..."
+    validations:
+      required: true
+  - type: textarea
+    id: users
+    attributes:
+      label: "Who is affected? / 谁会受益"
+      placeholder: "Solo Codex user, project lead, research team..."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: "Desired outcome / 期望结果"
+      description: "Describe the observable result, not only a UI control. / 请描述可观察的结果，而不仅是一个按钮。"
+    validations:
+      required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: "Current workaround / 当前替代办法"
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Optional proposal / 可选方案"
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: "Product boundaries / 产品边界"
+      options:
+        - label: "This can remain local-first and read-only / 可以保持本地优先和只读"
+        - label: "This does not require an LLM for core operation / 核心能力不强制依赖 LLM"

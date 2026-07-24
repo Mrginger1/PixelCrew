@@ -28,7 +28,7 @@
 
 PixelCrew 把同一个 Codex 项目里的任务变成一间安静、会自动更新的像素办公室：每项任务是一名员工，计划变成工位进度，最新工作出现在语言泡泡里，里程碑、报告、视频和模型则作为可追溯证据留在成果柜中，不再淹没于聊天记录。
 
-**不用手工搭办公室，不强制调用 LLM，也不制造虚假的忙碌感。** 运行 `init + serve`，PixelCrew 就会基于本地只读数据发现项目、生成办公室并持续同步。
+**不用手工搭办公室，不强制调用 LLM，也不制造虚假的忙碌感。** 运行 `init + start`，PixelCrew 就会基于本地只读数据发现项目、生成办公室并持续同步。
 
 ![PixelCrew 项目总览](docs/dashboard-preview.png)
 
@@ -83,11 +83,13 @@ pixelcrew init /absolute/path/to/your/project --name "My Fantastic Project"
 # 检查 Codex 本地数据以及任务发现是否正常
 pixelcrew doctor
 
-# 打开办公室
-pixelcrew serve
+# 后台稳定启动、检查状态并打开办公室
+pixelcrew start
+pixelcrew status
+pixelcrew open
 ```
 
-访问 **[http://127.0.0.1:8765](http://127.0.0.1:8765)**。此后新增任务、进度和成果会自动同步，不需要手工维护看板 JSON。
+PixelCrew 会打开 **[http://127.0.0.1:8765](http://127.0.0.1:8765)**。此后新增任务、进度和成果会自动同步，不需要手工维护看板 JSON。
 
 > 希望一步步体验？阅读 **[快速入门](docs/QUICKSTART.md)**。旧版入口 `python3 pixelcrew.py --config ... --port 8765` 仍保持兼容。
 
@@ -136,7 +138,9 @@ pixelcrew init /path/to/another/project \
   --output pixelcrew.another.json
 
 pixelcrew doctor --config pixelcrew.another.json
-pixelcrew serve --config pixelcrew.another.json --port 8766
+pixelcrew start --config pixelcrew.another.json --port 8766
+pixelcrew open --config pixelcrew.another.json
+# 稍后停止：pixelcrew stop --config pixelcrew.another.json
 ```
 
 未预设角色的新任务同样会自动入驻。只有在需要稳定昵称、职位或职责时，才需要配置 `roles`。
@@ -171,10 +175,11 @@ PixelCrew 从设计上坚持本地优先：
 
 | 文档 | 内容 |
 |---|---|
-| [快速入门](docs/QUICKSTART.md) | 安装、初始化、诊断与启动 |
+| [快速入门](docs/QUICKSTART.md) | 安装、初始化、诊断与本地服务管理 |
 | [系统架构](docs/ARCHITECTURE.md) | 任务发现、数据标准化、API 与渲染分层 |
 | [秘书机制](docs/SECRETARY.md) | 规则模式、AI 模式、脱敏、缓存与降级 |
 | [协作模型](docs/OPERATING_MODEL.md) | 角色、任务拆解、阶段报告、证据与验收 |
+| [产品工作台](docs/product/README.md) | PRD、独立评审、路线图与需求迭代流程 |
 | [项目章程](docs/PROJECT_CHARTER_TEMPLATE.md) | 可复用的项目级规划模板 |
 | [任务简报](docs/TASK_BRIEF_TEMPLATE.md) | 可复用的边界化子任务模板 |
 | [贡献指南](CONTRIBUTING.md) | 开发流程与贡献约定 |

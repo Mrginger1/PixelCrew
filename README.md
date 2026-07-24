@@ -28,7 +28,7 @@
 
 PixelCrew turns the tasks inside a Codex project into a calm, self-updating pixel office. Each task becomes a crew member. Plans become progress boards. Live updates appear as speech bubbles. Milestones, reports, videos, and models remain traceable as evidence—not buried in chat history.
 
-**No office setup ritual. No mandatory LLM. No productivity theatre.** Run `init + serve` and PixelCrew discovers the project, builds the office, and keeps it in sync using local, read-only data.
+**No office setup ritual. No mandatory LLM. No productivity theatre.** Run `init + start` and PixelCrew discovers the project, builds the office, and keeps it in sync using local, read-only data.
 
 ![PixelCrew dashboard](docs/dashboard-preview.png)
 
@@ -83,11 +83,13 @@ pixelcrew init /absolute/path/to/your/project --name "My Fantastic Project"
 # Verify that local Codex data and project tasks are discoverable
 pixelcrew doctor
 
-# Open the office
-pixelcrew serve
+# Start it safely in the background, verify it, and open it
+pixelcrew start
+pixelcrew status
+pixelcrew open
 ```
 
-Visit **[http://127.0.0.1:8765](http://127.0.0.1:8765)**. Future tasks, progress updates, and artifacts synchronize automatically—there is no dashboard JSON to maintain by hand.
+PixelCrew opens **[http://127.0.0.1:8765](http://127.0.0.1:8765)**. Future tasks, progress updates, and artifacts synchronize automatically—there is no dashboard JSON to maintain by hand.
 
 > Want a guided first run? See the **[Quick Start guide](docs/QUICKSTART.md)**. The legacy `python3 pixelcrew.py --config ... --port 8765` entry point remains supported.
 
@@ -136,7 +138,9 @@ pixelcrew init /path/to/another/project \
   --output pixelcrew.another.json
 
 pixelcrew doctor --config pixelcrew.another.json
-pixelcrew serve --config pixelcrew.another.json --port 8766
+pixelcrew start --config pixelcrew.another.json --port 8766
+pixelcrew open --config pixelcrew.another.json
+# Later: pixelcrew stop --config pixelcrew.another.json
 ```
 
 Tasks without predefined roles are admitted automatically. Add `roles` only when you want stable names, titles, or responsibilities.
@@ -171,10 +175,11 @@ PixelCrew is intentionally local-first:
 
 | Guide | What it covers |
 |---|---|
-| [Quick Start](docs/QUICKSTART.md) | Install, initialize, diagnose, and serve |
+| [Quick Start](docs/QUICKSTART.md) | Install, initialize, diagnose, and manage the local service |
 | [Architecture](docs/ARCHITECTURE.md) | Discovery, normalization, APIs, and rendering layers |
 | [Secretary Design](docs/SECRETARY.md) | Rule mode, AI mode, redaction, caching, and fallback |
 | [Operating Model](docs/OPERATING_MODEL.md) | Roles, delegation, reporting, evidence, and acceptance |
+| [Product Desk](docs/product/README.md) | PRD, independent reviews, roadmap, and iteration process |
 | [Project Charter](docs/PROJECT_CHARTER_TEMPLATE.md) | Reusable project-level planning template |
 | [Task Brief](docs/TASK_BRIEF_TEMPLATE.md) | Reusable bounded-task template |
 | [Contributing](CONTRIBUTING.md) | Development workflow and contribution expectations |

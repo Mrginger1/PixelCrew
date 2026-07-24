@@ -9,8 +9,8 @@
 ## 1. 安装
 
 ```bash
-git clone https://github.com/<your-account>/pixelcrew.git
-cd pixelcrew
+git clone https://github.com/Mrginger1/PixelCrew.git
+cd PixelCrew
 python3 -m pip install -e .
 ```
 
@@ -19,12 +19,23 @@ python3 -m pip install -e .
 ```bash
 pixelcrew init /absolute/path/to/project --name "Project Name"
 pixelcrew doctor
-pixelcrew serve
+pixelcrew start
+pixelcrew status
+pixelcrew open
 ```
 
-浏览器打开 `http://127.0.0.1:8765`。到这里已经完成，不需要 LLM，也不需要手工登记员工。
+`open` 会打开 `http://127.0.0.1:8765`。到这里已经完成，不需要 LLM，也不需要手工登记员工。
 
-`init` 写入本地 `pixelcrew.json`；`serve` 从 Codex 本地状态中按项目目录发现任务。每个新任务会自动变成 Crew，页面每 60 秒刷新。
+`init` 写入本地 `pixelcrew.json`；`start` 在后台启动只监听本机的服务，并在项目的 `.pixelcrew/` 下保存 PID、身份令牌和日志。`status` 会同时检查配置、进程身份和 `/api/status` 健康状态。每个新任务会自动变成 Crew，页面每 60 秒刷新。
+
+常用生命周期命令：
+
+```bash
+pixelcrew status       # 查看 URL、PID 和日志
+pixelcrew open         # 只在服务健康时打开本地页面
+pixelcrew stop         # 仅停止身份可验证的本项目 PixelCrew 进程
+pixelcrew serve        # 兼容入口：保持服务在当前终端前台运行
+```
 
 ## 3. 可选：指定负责人和昵称
 
@@ -65,7 +76,9 @@ pixelcrew secretary
 
 ```bash
 pixelcrew init /path/to/project-b --output pixelcrew.b.json
-pixelcrew serve --config pixelcrew.b.json --port 8766
+pixelcrew start --config pixelcrew.b.json --port 8766
+pixelcrew open --config pixelcrew.b.json
+# 停止时使用同一配置：pixelcrew stop --config pixelcrew.b.json
 ```
 
 ## 常见问题
